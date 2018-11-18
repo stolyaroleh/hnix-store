@@ -4,6 +4,7 @@ Maintainer  : Shea Levy <shea@shealevy.com>
 -}
 {-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE TypeInType #-}
 module System.Nix.Path
   ( FilePathPart(..)
   , PathHashAlgo
@@ -18,7 +19,10 @@ module System.Nix.Path
   ) where
 
 import           System.Nix.Hash           (Digest(..),
-                                            HashAlgorithm(Truncated, SHA256))
+                                            HashAlgorithm,
+                                            HashAlgorithm'(..)
+                                            )
+import           System.Nix.Hash
 import qualified Data.ByteString           as BS
 import qualified Data.ByteString.Char8     as BSC
 import           Data.Hashable             (Hashable (..), hashPtrWithSalt)
@@ -31,6 +35,8 @@ import           System.IO.Unsafe          (unsafeDupablePerformIO)
 import           Text.Regex.Base.RegexLike (makeRegex, matchTest)
 import           Text.Regex.TDFA.Text      (Regex)
 
+class Trivial (a :: HashAlgorithm) where
+  
 -- | The hash algorithm used for store path hashes.
 type PathHashAlgo = Truncated 20 SHA256
 
