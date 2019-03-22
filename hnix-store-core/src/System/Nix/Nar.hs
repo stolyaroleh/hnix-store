@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP                 #-}
 {-# LANGUAGE FlexibleContexts    #-}
 {-# LANGUAGE KindSignatures      #-}
 {-# LANGUAGE OverloadedStrings   #-}
@@ -256,7 +257,11 @@ narEffectsIO = NarEffects {
   , narGetPerms   = getPermissions
   , narSetPerms   = setPermissions
   , narIsDir      = fmap isDirectory <$> getFileStatus
+#if MIN_VERSION_directory(1,3,0)
   , narIsSymLink  = pathIsSymbolicLink
+#else
+  , narIsSymLink  = isSymbolicLink
+#endif
   , narFileSize   = fmap (fromIntegral . fileSize) <$> getFileStatus
   , narReadLink   = readSymbolicLink
   }
