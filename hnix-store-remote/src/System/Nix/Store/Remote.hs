@@ -14,12 +14,10 @@ module System.Nix.Store.Remote (
   , buildPaths
   ) where
 
-import           Data.Binary.Put (Put, putInthost)
 import           Data.ByteString (ByteString)
-import           System.Nix.Util
+import           System.Nix.Store.Remote.Binary
 import           System.Nix.Store.Remote.Types
 import           System.Nix.Store.Remote.Protocol
-import           System.Nix.Store.Remote.Util
 
 type RepairFlag = Bool
 type CheckFlag = Bool
@@ -34,16 +32,6 @@ verifyStore :: CheckFlag -> RepairFlag -> MonadStore ()
 verifyStore check repair = runOpArgs_ VerifyStore $ do
   putBool check
   putBool repair
-
-data BuildMode = Normal | Repair | Check
-  deriving (Eq, Show)
-
-putBuildMode :: BuildMode -> Put
-putBuildMode mode = putInthost $
-  case mode of
-    Normal -> 0
-    Repair -> 1
-    Check -> 2
 
 buildPaths ::
   -- forall storeDir . (KnownStoreDir storeDir) =>

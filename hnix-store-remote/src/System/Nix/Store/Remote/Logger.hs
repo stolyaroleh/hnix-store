@@ -10,8 +10,8 @@ import           Control.Monad.Reader      (ask, liftIO)
 import           Data.Binary.Get
 import           Network.Socket.ByteString (recv)
 import           Pipes                     (lift, yield)
+import           System.Nix.Store.Remote.Binary
 import           System.Nix.Store.Remote.Types
-import           System.Nix.Util
 
 controlParser :: Get Logger
 controlParser = do
@@ -22,9 +22,9 @@ controlParser = do
     0x64617416 -> Write         <$> getByteStringLen
     0x616c7473 -> pure Last
     0x63787470 -> flip Error    <$> getByteStringLen <*> getInt
-    0x53545254 -> StartActivity <$> getInt <*> getInt <*> getInt <*> getByteStringLen <*> getFields <*> getInt
+    0x53545254 -> StartActivity <$> getInt <*> getVerbosity <*> getActivityType <*> getByteStringLen <*> getFields <*> getInt
     0x53544f50 -> StopActivity  <$> getInt
-    0x52534c54 -> Result        <$> getInt <*> getInt <*> getFields
+    0x52534c54 -> Result        <$> getInt <*> getResultType <*> getFields
     x          -> fail           $ "Invalid control message received:" ++ show x
 
 logger :: Logger -> MonadStore ()

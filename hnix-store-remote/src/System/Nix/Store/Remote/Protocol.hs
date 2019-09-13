@@ -21,10 +21,10 @@ import           Network.Socket
 import           Pipes
 import qualified Pipes.Prelude as Pipes
 
+import           System.Nix.Store.Remote.Binary
 import           System.Nix.Store.Remote.Logger
 import           System.Nix.Store.Remote.Types
 import           System.Nix.Store.Remote.Util
-import           System.Nix.Util
 
 protoVersion :: Int
 protoVersion = 0x115
@@ -127,18 +127,18 @@ runOpArgs_ op args = runOpArgs op args (skip 8)
 
 runStore :: Consumer Logger IO (Either Error a) -> MonadStore a -> IO (Either Error a)
 runStore sink code =
-  bracket (open sockPath) close run `catch` onException
+  bracket open close run `catch` onException
   where
-    open path = do
+    open = do
       sock <- socket AF_UNIX Stream 0
-      connect sock (SockAddrUnix path)
+      connect sock (SockAddrUnix sockPath)
       return sock
 
     greet = do
       sockPut $ putInt workerMagic1
 
-      magic2 <- sockGetInt
-      _ <- sockGetInt -- daemonVersion
+      magic2 <- sockGet (getInt @Int)
+      _ <- sockGet (getInt @Int) -- daemonVersion
 
       unless (magic2 == workerMagic2) $
         throwError (ConnError "Worker magic 2 mismatch")
