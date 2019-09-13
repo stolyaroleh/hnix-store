@@ -1,6 +1,6 @@
 huper: helf: {
   hnix-store-core =
-    helf.callCabal2nix "hnix-store-core" ./hnix-store-core {};
+    helf.callPackage ./hnix-store-core.nix {};
   hnix-store-remote =
-    helf.callCabal2nix "hnix-store-remote" ./hnix-store-remote {};
+    helf.callPackage ./hnix-store-remote.nix {};
 }
