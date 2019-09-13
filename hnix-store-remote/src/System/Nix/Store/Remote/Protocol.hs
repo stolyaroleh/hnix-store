@@ -7,6 +7,7 @@ module System.Nix.Store.Remote.Protocol (
   , runOpArgs_
   , runStore
   , runStore_
+  , runStorePrint
   ) where
 
 import           Control.Exception         (SomeException, bracket, catch, displayException)
@@ -162,3 +163,11 @@ runStore sink code =
 
 runStore_ :: MonadStore a -> IO (Either Error a)
 runStore_ = runStore Pipes.drain
+
+runStorePrint :: MonadStore a -> IO (Either Error a)
+runStorePrint = runStore (Pipes.mapM_ print')
+  where
+    print' line = unless (isBoring line) (print line)
+    isBoring (Next _) = True
+    isBoring Last = True
+    isBoring _ = False
