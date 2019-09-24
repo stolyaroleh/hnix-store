@@ -5,7 +5,6 @@
 , binary
 , bytestring
 , containers
-, hnix-store-core
 , mtl
 , network
 , pipes
@@ -28,19 +27,15 @@ mkDerivation {
   ];
   libraryHaskellDepends = [
     base
-    base64-bytestring
     binary
     bytestring
     containers
-    hnix-store-core
     mtl
     network
     pipes
     pretty-simple
     text
     time
-    unix
-    unordered-containers
   ];
   homepage = "https://github.com/haskell-nix/hnix-store";
   description = "Remote hnix store";

@@ -52,8 +52,6 @@ isValidPath path' = runOpArgs IsValidPath (putByteStringLen path') getBool
 hasSubstitutes :: StorePath -> MonadStore Bool
 hasSubstitutes path' = runOpArgs HasSubstitutes (putByteStringLen path') getBool
 
-type RecursiveFlag = Bool
-
 addTextToStore :: ByteString -> StorePath -> [StorePath] -> MonadStore StorePath
 addTextToStore suffix contents refs = runOpArgs AddTextToStore putArgs getResult
   where

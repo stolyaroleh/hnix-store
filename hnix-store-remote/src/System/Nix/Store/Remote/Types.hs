@@ -8,6 +8,7 @@ module System.Nix.Store.Remote.Types (
   , Logger(..)
   , Field(..)
   , BuildMode(..)
+  , StorePathTrust(..)
   , ValidPathInfo(..)
   , SubstitutablePathInfo(..)
   , GCRoot(..)
@@ -21,7 +22,6 @@ import           Data.ByteString           (ByteString)
 import           Data.Time                 (UTCTime)
 import           Network.Socket            (Socket)
 import           Pipes
-import           System.Nix.StorePathMetadata (StorePathTrust)
 
 data Error =
     LogError Int ByteString
@@ -84,6 +84,13 @@ data Logger =
   deriving (Eq, Ord, Show)
 
 data BuildMode = Normal | Repair | Check
+  deriving (Eq, Show)
+
+data StorePathTrust
+  = -- | It was built locally and thus ultimately trusted
+    BuiltLocally
+  | -- | It was built elsewhere (and substituted or similar) and so is less trusted
+    BuiltElsewhere
   deriving (Eq, Show)
 
 data ValidPathInfo = ValidPathInfo

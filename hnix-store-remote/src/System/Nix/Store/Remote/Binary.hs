@@ -13,7 +13,6 @@ import           Data.Word (Word64)
 import           Data.Time (UTCTime)
 import           Data.Time.Clock.POSIX (posixSecondsToUTCTime)
 
-import           System.Nix.StorePathMetadata
 import           System.Nix.Store.Remote.Types
 
 getMany :: Get a -> Get [a]
