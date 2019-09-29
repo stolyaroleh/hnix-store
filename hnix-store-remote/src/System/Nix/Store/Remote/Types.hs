@@ -29,7 +29,7 @@ data Error =
   | ConnError String
   deriving (Eq, Show)
 
-type MonadStore a = ExceptT Error (Producer Logger (ReaderT Socket IO)) a
+type MonadStore = ExceptT Error (Producer Logger (ReaderT Socket IO))
 
 type ActivityID = Int
 type ActivityParentID = Int
