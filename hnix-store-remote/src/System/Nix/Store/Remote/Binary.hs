@@ -38,14 +38,24 @@ putBool :: Bool -> Put
 putBool True  = putInt (1 :: Int)
 putBool False = putInt (0 :: Int)
 
+calcPadding :: Int -> Int
+calcPadding len = (8 - (len `mod` 8)) `mod` 8
+
+addPadding :: Int -> Put
+addPadding len = replicateM_ (calcPadding len) (putWord8 0)
+
+skipPadding :: Int -> Get ()
+skipPadding len = replicateM_ (calcPadding len) $ do
+  x <- getWord8
+  unless (x == 0) (fail "Non-zero padding")
+
 -- length prefixed string packing with padding to 8 bytes
 putByteStringLen :: ByteString -> Put
 putByteStringLen str = do
-  putInt $ len
+  let len = BS.length str
+  putInt len
   putByteString str
-  pad $ 8 - (len `mod` 8)
-  where len = BS.length str
-        pad x = replicateM_ x (putWord8 0)
+  addPadding len
 
 putByteStrings :: Foldable t => t ByteString -> Put
 putByteStrings xs = do
@@ -55,12 +65,7 @@ putByteStrings xs = do
 getByteStringLen :: Get ByteString
 getByteStringLen = do
   len <- getInt
-  st <- getByteString len
-  when (len `mod` 8 /= 0) $ do
-    pads <- unpad $ fromIntegral $ 8 - (len `mod` 8)
-    unless (all (==0) pads) $ fail $ "No zeroes" ++ show (st, len, pads)
-  return st
-  where unpad x = replicateM x getWord8
+  getByteString len <* skipPadding len
 
 getByteStrings :: Get [ByteString]
 getByteStrings = getMany getByteStringLen
